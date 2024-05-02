@@ -1,10 +1,9 @@
 #lang forge
 
-sig Student {}
 sig ExamSlot {}
 
 sig Course {
-    students: set Student
+    intersecting: set Course
 }
 
 sig Scheduling {
@@ -12,7 +11,17 @@ sig Scheduling {
 }
 
 pred wellformed_course {
-    all c: Course | some c.students
+    // no course can intersect with itself
+    all disj c1, c2: Course | {
+        // all courses are connected by intersecting
+        reachable[c1, c2, intersecting]
+
+        // the graph is undirected
+        c1 in c2.intersecting implies c2 in c1.intersecting
+    }
+
+    // no self-intersection
+    all c: Course | c not in c.intersecting
 }
 
 pred wellformed_schedule {
@@ -23,7 +32,7 @@ pred wellformed_schedule {
         // if there's some intersection of students between two courses
         // then the exam time slots are different
         all disj c1, c2: Course | {
-            some (c1.students & c2.students) implies s.schedule[c1] != s.schedule[c2]
+            (c1 in c2.intersecting) implies s.schedule[c1] != s.schedule[c2]
         }
     }
 }
@@ -31,4 +40,4 @@ pred wellformed_schedule {
 run { 
   wellformed_schedule
   wellformed_course
-} for exactly 3 Course, exactly 4 Student, exactly 2 ExamSlot, exactly 1 Scheduling
+} for exactly 3 Course, exactly 2 ExamSlot, exactly 1 Scheduling
