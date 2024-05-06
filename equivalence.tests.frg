@@ -6,7 +6,22 @@ open "equivalence.frg"
 
 
 // testing equivalence
+test suite for isomorphism {
 
+  // First we show that if we have a wellformed graph 
+  // and we know there is an isomorphism with the courses, then the courses are wellformed
+  test expect { try1: {
+    wellformed_course and isomorphism implies wellformed_graph
+    } for exactly 1 Equivalence is theorem
+  }
+  
+  //Similarly, we show that if we have wellformed courses
+  // and we know there is an isomorphism with the graph, then the graph is wellformed
+test expect { try2: {
+    wellformed_graph and isomorphism implies wellformed_course
+    } for exactly 1 Equivalence is theorem
+  }
+}
 
 // basic tests for graph coloring
 test suite for wellformed_graph {

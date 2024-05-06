@@ -4,11 +4,11 @@ open "coloring.frg"
 open "scheduling.frg"
 
 sig Equivalence {
-    morphism: set Course -> set Vertex
+    morphism: set Course -> Vertex
 }
 
 sig SlotColorCorrespondance {
-    mapping: set ExamSlot -> set Color
+    mapping: set ExamSlot -> Color
 }
 
 // define constraints on the mapping
@@ -23,14 +23,15 @@ sig SlotColorCorrespondance {
 pred isomorphism {
     all equiv : Equivalence | {
         -- total
-        all course : Course | some equiv.morphism[course]
+        all course : Course | one equiv.morphism[course]
         -- injective
         all disj course1, course2 : Course | equiv.morphism[course1] != equiv.morphism[course2]
         -- surjective
-        all vertex : Vertex | some course : Course | equiv.morphism[course] = vertex
+        all vertex : Vertex | one course : Course | equiv.morphism[course] = vertex
         -- "shape" preserving
         -- note: in both wellformed graphs and schedules we impose that intersecting and adjacent are reflexive
-        all disj course1, course2 : Course | (equiv.morphism[course1] in equiv.morphism[course2].adjacent) iff (course 1 in course2.intersecting)
+        all course1, course2 : Course | (equiv.morphism[course1] in (equiv.morphism[course2]).adjacent) implies (course1 in course2.intersecting)
+        all course1, course2 : Course | (course1 in course2.intersecting) implies (equiv.morphism[course1] in (equiv.morphism[course2]).adjacent)
     }
 }
 

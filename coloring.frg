@@ -30,15 +30,14 @@ pred wellformed_colorings {
         all vertex: Vertex | one coloring.color[vertex]
     
         // no two adjacent vertices have the same color
-        all disj v1, v2: Vertex | {
-            v2 in v1.adjacent implies (coloring.color[v2] != coloring.color[v1])
-        }
+    all disj v1, v2: Vertex | {
+        v2 in v1.adjacent implies (coloring.color[v2] != coloring.color[v1])
+    }
     }
 }
 
 pred is_wellformed_coloring[coloring:Coloring] {
     all vertex: Vertex | one coloring.color[vertex]
-    
     // no two adjacent vertices have the same color
     all disj v1, v2: Vertex | {
         v2 in v1.adjacent implies (coloring.color[v2] != coloring.color[v1])
