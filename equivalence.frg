@@ -72,3 +72,7 @@ pred concat_is_wellformed_scheduling[relation: set Course -> set ExamSlot] {
         (c1 in c2.intersecting) implies c1.relation != c2.relation
     }
 }
+
+run {
+    isomorphism and correspondance and wellformed_colorings and wellformed_graph
+} for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance
