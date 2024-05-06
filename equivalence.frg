@@ -38,11 +38,11 @@ pred isomorphism {
 pred correspondance {
     all scc : SlotColorCorrespondance | {
         -- total
-        all slot : ExamSlot | some scc.mapping[slot]
+        all slot : ExamSlot | one scc.mapping[slot]
         -- injective
         all disj slot1, slot2 : ExamSlot | scc.mapping[slot1] != scc.mapping[slot2]
         -- surjective
-        all color: Color | some slot: ExamSlot | scc.mapping[slot] = color
+        all color: Color | one slot: ExamSlot | scc.mapping[slot] = color
     }
 }
 

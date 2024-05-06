@@ -57,9 +57,15 @@ test suite for isomorphism {
   // this gives the error "join could create a relation of arity 0" not sure why :'(
   test expect {try5: {
     isomorphism and correspondance and wellformed_colorings and wellformed_graph implies {
-      concat_is_wellformed_scheduling[(Equivalence.morphism).Coloring.~(SlotColorCorrespondance.mapping)]
+      concat_is_wellformed_scheduling[(Equivalence.morphism).(Coloring.color).~(SlotColorCorrespondance.mapping)]
       }
   } for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is theorem}
+
+  test expect {try6: {
+    isomorphism and correspondance and wellformed_schedule and wellformed_course implies {
+      concat_is_wellformed_coloring[(~(Equivalence.morphism)).(Scheduling.schedule).(SlotColorCorrespondance.mapping)]
+      }
+  } for exactly 1 Scheduling, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is theorem}
 }
 
 // basic tests for graph coloring
