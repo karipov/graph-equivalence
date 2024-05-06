@@ -37,6 +37,17 @@ pred wellformed_schedule {
     }
 }
 
+pred is_wellformed_scheduling[sched : Scheduling] {
+    // all courses have some assigned exam time slot
+    all c: Course | some sched.schedule[c]
+
+        // if there's some intersection of students between two courses
+        // then the exam time slots are different
+    all disj c1, c2: Course | {
+        (c1 in c2.intersecting) implies sched.schedule[c1] != sched.schedule[c2]
+    }
+}
+
 run { 
   wellformed_schedule
   wellformed_course
