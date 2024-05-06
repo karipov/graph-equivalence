@@ -1,6 +1,6 @@
 #lang forge
 
-open "graph-coloring.frg"
+open "coloring.frg"
 open "scheduling.frg"
 
 sig Equivalence {
