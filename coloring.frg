@@ -29,7 +29,7 @@ pred wellformed_colorings {
     all coloring: Coloring | {
 
         // all colors are used
-        // all c: Color | some vertex: Vertex | coloring.color[vertex] = c
+        all c: Color | some vertex: Vertex | coloring.color[vertex] = c
 
         // all vertices are colored
         all vertex: Vertex | one coloring.color[vertex]
