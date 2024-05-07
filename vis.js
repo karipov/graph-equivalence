@@ -158,6 +158,8 @@ function create_nodes(node_positions, node_colors) {
             borderWidth: EDGE_WIDTH,
             color: node_colors[idx],
             borderColor: 'black', 
+            label: idx.toString(),
+            labelSize: NODE_RADIUS,
         });
         node_objects.push(circle);
     });
