@@ -6,7 +6,67 @@ open "equivalence.frg"
 
 
 // testing equivalence
+test suite for isomorphism {
 
+  // First we show that if we have a wellformed graph 
+  // and we know there is an isomorphism with the courses, then the courses are wellformed
+  test expect { try1: {
+    wellformed_course and isomorphism implies wellformed_graph
+    } for exactly 1 Equivalence is theorem
+  }
+
+  //Similarly, we show that if we have wellformed courses
+  // and we know there is an isomorphism with the graph, then the graph is wellformed
+  test expect { try2: {
+    wellformed_graph and isomorphism implies wellformed_course
+    } for exactly 1 Equivalence is theorem
+  }
+
+  // Now that we know that the "shape" equivalence works,
+  // we can move onto coloring and scheduling questions:
+  
+  // We prove that if we have:
+  // -- wellformed graph
+  // -- a wellformed coloring
+  // -- an isomorphism between the graph and the courses
+  // -- a 1 to 1 correspondance between colors and exam slots
+  // then, there exists a wellformed scheduling for the courses
+  test expect { try3: {
+    wellformed_graph and isomorphism and wellformed_colorings and correspondance implies wellformed_schedule
+  } for exactly 1 Coloring, exactly 1 Scheduling is sat}
+
+  // Similarly, we prove that if we have:
+  // -- wellformed courses
+  // -- a wellformed scheduling
+  // -- an isomorphism between the graph and the courses
+  // -- a 1 to 1 correspondance between colors and exam slots
+  // then, there exists a wellformed coloring for the graph
+  test expect { try4: {
+    wellformed_course and isomorphism and wellformed_schedule and correspondance implies wellformed_colorings
+  } for exactly 1 Coloring, exactly 1 Scheduling is sat}
+
+  // The two previous tests prove that a graph is colorable with a certain number of colors
+  // if and only if the corresponding isomorphic courses have a schedule with that same number of exam slots
+  // In sum, this means that if we can solve one problem, we know the other has the same answer
+
+  // Beyond *knowing* if the problems are solvable, 
+  // is it possible to solve one to get the solution for the other?
+  // AKA given a wellformed schedule can we fully specify a wellformed coloring ?
+  // And given a wellformed coloring, can we fully specify a wellformed schedule ?
+
+  // this gives the error "join could create a relation of arity 0" not sure why :'(
+  test expect {try5: {
+    isomorphism and correspondance and wellformed_colorings and wellformed_graph implies {
+      concat_is_wellformed_scheduling[(Equivalence.morphism).(Coloring.color).~(SlotColorCorrespondance.mapping)]
+      }
+  } for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is theorem}
+
+  test expect {try6: {
+    isomorphism and correspondance and wellformed_schedule and wellformed_course implies {
+      concat_is_wellformed_coloring[(~(Equivalence.morphism)).(Scheduling.schedule).(SlotColorCorrespondance.mapping)]
+      }
+  } for exactly 1 Scheduling, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is theorem}
+}
 
 // basic tests for graph coloring
 test suite for wellformed_graph {
@@ -65,7 +125,7 @@ test suite for wellformed_and_colored {
     test expect { one_color_impossible: {
         wellformed_and_colored
         #{v: Vertex | some v} > 1
-    } for exactly 1 Color is unsat}
+    } for exactly 1 Color, exactly 1 Coloring is unsat}
 
     test expect {incomplete_color: {
       wellformed_and_colored
