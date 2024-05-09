@@ -1,13 +1,37 @@
-// ----------------------------------- GENERAL CONSTANTS ------------------------------------
+// ---------------------------------- GENERAL CONSTANTS -------------------------------------
 
 const SCREEN_WIDTH = 500;
-const SCREEN_HEIGHT = 500; 
+const SCREEN_HEIGHT = 600; 
+
+const GRAPH_WIDTH = 500;
+const GRAPH_HEIGHT = 500;
+
+// -------------------------------- GRID RELATED CONSTANTS ----------------------------------
+
+const GRID_X = GRAPH_WIDTH * 0.1 / 2;
+const GRID_Y = GRAPH_HEIGHT * 0.1 / 2;
+const GRID_CELL_WIDTH = (_) => (GRAPH_WIDTH * 0.9) / 2;
+const GRID_CELL_HEIGHT = (node_len) => (GRAPH_HEIGHT * 0.9) / node_len;
+
+// ------------------------------- BUTTON RELATED CONSTANTS ---------------------------------
+
+const BUTTONS = ['COLOR', 'CONVERT'];
+const BUTTON_WIDTH = SCREEN_WIDTH / BUTTONS.length * 0.9;
+const BUTTON_HEIGHT = (SCREEN_HEIGHT - GRAPH_HEIGHT) * 0.7;
+const BUTTON_SPACING = SCREEN_WIDTH / (BUTTONS.length + 1) * 0.1;
+const BUTTON_Y = GRAPH_HEIGHT;
+const BUTTON_XS = BUTTONS.map((_, idx) =>
+    BUTTON_SPACING + idx * (BUTTON_WIDTH + BUTTON_SPACING)
+);
+
+const BUTTON_TEXT_Y = BUTTON_Y + BUTTON_HEIGHT / 2;
+const BUTTON_TEXT_XS = BUTTON_XS.map(x => x + BUTTON_WIDTH / 2);
 
 // -------------------------------- GRAPH RELATED CONSTANTS ---------------------------------
 
-const NODE_RADIUS = 0.05 * (SCREEN_HEIGHT + SCREEN_WIDTH) / 2;
-const EDGE_WIDTH = 0.01 * (SCREEN_HEIGHT + SCREEN_WIDTH) / 2;
-const GRAPH_RADIUS = 0.9 * ((SCREEN_HEIGHT + SCREEN_WIDTH) / 4) - NODE_RADIUS;
+const NODE_RADIUS = 0.05 * (GRAPH_HEIGHT + GRAPH_WIDTH) / 2;
+const EDGE_WIDTH = 0.01 * (GRAPH_HEIGHT + GRAPH_WIDTH) / 2;
+const GRAPH_RADIUS = 0.9 * ((GRAPH_HEIGHT + GRAPH_WIDTH) / 4) - NODE_RADIUS;
 
 // ------------------------- FORGE AND INSTANCE-RELATED FUNCTIONS ---------------------------
 
@@ -66,7 +90,9 @@ function get_node_to_node() {
 
     let adjacency_map = new Map();
     vertices.forEach(vertex => {
-        const neighbors = vertex.join(adjacent_field).tuples().map(vtx => vtx.atoms()[0].id());
+        const neighbors = vertex.join(adjacent_field).tuples().map(
+            vtx => vtx.atoms()[0].id()
+        );
 
         const neighbor_idxs = neighbors.map(neighbor => get_index(neighbor));
         const vertex_idx = get_index(vertex.id());
@@ -113,14 +139,25 @@ function create_node_colors(N) {
     return colors;
 }
 
+/**
+ * Set the color of each node according to the coloring
+ * @param {Array<Circle>} nodes Array of Circle objects
+ * @param {Array<String>} node_colors Array of colors in hexadecimal format
+ */
+function color_nodes(nodes, node_colors) {
+    nodes.forEach((node, idx) => {
+        node.setColor(node_colors[idx]);
+    });
+}
+
 // -------------------------------- GRAPH CREATION FUNCTIONS --------------------------------
 
 /**
- * Calculates the coordinates of the center of the screen
+ * Calculates the coordinates of the center of the graph (not canvas as a whole)
  * @returns {Object} Object with x and y coordinates of the center of the screen
  */
 function get_center() {
-    return {x: SCREEN_WIDTH/2, y: SCREEN_HEIGHT/2}
+    return {x: GRAPH_WIDTH/2, y: GRAPH_HEIGHT/2}
 }
 
 /**
@@ -156,7 +193,7 @@ function create_nodes(node_positions, node_colors) {
             radius: NODE_RADIUS,
             center: position,
             borderWidth: EDGE_WIDTH,
-            color: node_colors[idx],
+            color: 'white',
             borderColor: 'black', 
             label: idx.toString(),
             labelSize: NODE_RADIUS,
@@ -188,7 +225,154 @@ function create_edges(nodes, adjacency_map) {
     return edges;
 }
 
-// -------------------------------------- VISUALIZATION -------------------------------------
+/**
+ * Create the buttons for the visualization
+ * @param {Number} N Number of buttons
+ * @param {Array<Function>} callbacks Functions to be called when the button is clicked
+ * @returns {Array<Rectangle | TextBox>} Array of Rectangle and TextBox objects
+ */
+function create_buttons(N, callbacks) {
+    let buttons = [];
+    for (let i = 0; i < N; i++) {
+        const text_box = new TextBox({
+            text: BUTTONS[i],
+            coords: { x: BUTTON_TEXT_XS[i], y: BUTTON_TEXT_Y},
+            fontSize: BUTTON_WIDTH / 5.5,
+            color: 'black',
+            events: [ { event: 'click', callback: () => { 
+                        callbacks[i]();
+                        stage.render(svg, document);
+                    } } ]
+        });
+        const box = new Rectangle({
+            coords: { x: BUTTON_XS[i], y: BUTTON_Y},
+            width: BUTTON_WIDTH,
+            height: BUTTON_HEIGHT,
+            color: 'grey',
+        });
+        buttons.push(box);
+        buttons.push(text_box);
+    }
+    return buttons;
+}
+
+// ------------------------------- SCHEDULE CREATION FUNCTIONS ------------------------------
+
+/**
+ * Generate realistic time-slots in the format of HH(AM/PM) - HH(AM/PM)
+ * @param {Number} N number of time slots
+ * @returns {Array} Array of strings with the time slots
+ */
+function generate_time_slots(N) {
+    const time_slots = [];
+    for (let i = 0; i < N; i++) {
+        const start_hour = i + 8;
+        const end_hour = (i + 1) + 8;
+
+        const start_am_pm = start_hour < 12 ? 'AM' : 'PM';
+        const end_am_pm = end_hour < 12 ? 'AM' : 'PM';
+
+        const start_hour_12 = start_hour % 12 === 0 ? 12 : start_hour % 12;
+        const end_hour_12 = end_hour % 12 === 0 ? 12 : end_hour % 12;
+
+        time_slots.push(`${start_hour_12}${start_am_pm} - ${end_hour_12}${end_am_pm}`);
+    }
+    return time_slots;
+}
+
+/**
+ * Create the grid for the schedule visualization
+ * @param {Array<String>} node_colors Array of colors in hexadecimal format
+ * @returns {[Grid, Rectangle]} The grid object and the grid slots
+ *         (Rectangles with the color and time-slot)
+ */
+function create_grid(node_colors) {
+    let grid = new Grid({
+        grid_location: { x: GRID_X, y: GRID_Y },
+        cell_size: {
+            x_size: GRID_CELL_WIDTH(node_colors.length),
+            y_size: GRID_CELL_HEIGHT(node_colors.length) },
+        grid_dimensions: { x_size: 2 , y_size: node_colors.length },
+    });
+
+    // add each course to the grid
+    for (let i = 0; i < node_colors.length; i++) {
+        grid.add({ x: 0, y: i }, new TextBox({
+            text: `Course #${i}`,
+                fontSize: GRID_CELL_HEIGHT(node_colors.length) / 2.5,
+                color: 'black',
+            }));
+    }
+
+    // add each color / time-slot to the grid
+    let slots = generate_time_slots(get_how_many_colors());
+    let node_slots = get_node_to_color().map(idx => slots[idx]);
+
+    let grid_slots = [];
+    for (let i = 0; i < node_colors.length; i++) {
+        let slot = new Rectangle({
+            width: GRID_CELL_WIDTH(node_colors.length),
+            height: GRID_CELL_HEIGHT(node_colors.length),
+            color: 'white',
+            borderColor: 'black',
+            label: node_slots[i],
+            labelSize: GRID_CELL_HEIGHT(node_colors.length) / 2.5,
+            labelColor: 'white',
+        });
+        grid.add({ x: 1, y: i }, slot);
+        grid_slots.push(slot);
+    }
+   
+    return [grid, grid_slots];
+}
+
+// --------------------------------- BUTTON STATE MACHINE -----------------------------------
+
+/**
+ * Toggles the color of the nodes and the grid slots
+ * @param {Array<Circle>} nodes Array of Circle objects
+ * @param {Array<String>} node_colors Array of colors in hexadecimal format
+ * @param {Array<Rectangle>} grid_slots Array of Rectangle objects
+ *        representing the grid slots
+ */
+let color_button_toggle = false;
+function color_button(nodes, node_colors, grid_slots) {
+    color_button_toggle = !color_button_toggle;
+    if (color_button_toggle) {
+        color_nodes(nodes, node_colors);
+        grid_slots.forEach((slot, idx) => {
+            slot.setColor(node_colors[idx]);
+            slot.setLabelColor('black');
+        })
+    } else {
+        color_nodes(nodes, Array(nodes.length).fill('white'));
+        grid_slots.forEach(slot => {
+            slot.setColor('white');
+            slot.setLabelColor('white');
+        })
+    }
+}
+
+/**
+ * Toggles between the graph and the grid
+ * @param {Stage} stage D3FX Stage object
+ * @param {Array<Object>} other_objects Array of graph-related objects
+ * @param {Grid} grid Grid object
+ */
+let convert_button_toggle = false;
+function convert_button(stage, other_objects, grid) {
+    convert_button_toggle = !convert_button_toggle;
+    if (convert_button_toggle) {
+        other_objects.forEach(obj => stage.remove(obj));
+        stage.add(grid);
+    } else {
+        other_objects.forEach(obj => stage.add(obj));
+        stage.remove(grid);
+    }
+}
+
+
+// ------------------------------------ VISUALIZATION ---------------------------------------
 
 const stage = new Stage();
 
@@ -204,14 +388,18 @@ let nodes = create_nodes(node_positions, node_colors);
 let adjacency_map = get_node_to_node();
 let edges = create_edges(nodes, adjacency_map);
 
-// add each node to the stage
-nodes.forEach(node => {
-    stage.add(node);
-});
+// generate grid
+let [grid, grid_slots] = create_grid(node_colors);
 
-// add each edge to the stage
-edges.forEach(edge => {
-    stage.add(edge);
+// generate buttons
+let buttons = create_buttons(BUTTONS.length,
+    [() => color_button(nodes, node_colors, grid_slots),
+    () => convert_button(stage, nodes.concat(edges), grid)]
+);
+
+// add all the objects to the initial render
+nodes.concat(edges, buttons).forEach(obj => {
+    stage.add(obj);
 });
 
 stage.render(svg, document);
