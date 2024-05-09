@@ -136,7 +136,7 @@ We wrote tests to check for over constraint and under constraint for all our mod
 
 #### Property tests
 
-THe main goal of this project is to prove that graph coloring and scheduling problems were equivalent. This is particularly well illustrated by the visualization. We did so in three steps:
+The main goal of this project is to prove that graph coloring and scheduling problems were equivalent. This is particularly well illustrated by the visualization. We did so in three steps:
 
 1. We proved that if we have a wellformed graph and an isomorphism between a graph and a set of intersecting courses, then the courses must also be wellformed. Conversely, we proved that if we have a wellformed set of intersecting courses and an isomorphism between a graph and a set of intersecting courses, then the graph must also be wellformed. This verifies that there is a bijection bewteen the constraints of each problem.
 
