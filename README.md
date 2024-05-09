@@ -66,6 +66,42 @@ sig Scheduling {
 ````
 Notice how similar the structure is to graph coloring. 
 
+#### Graph-coloring and Scheduling equivalence
+
+
+
+## Predicates
+> At a high level, what do each of your sigs and preds represent in the context of the model? Justify the purpose for their existence and how they fit together.
+
+#### Graph-coloring predicates
+
+- Our `wellformed_graph` predicate checks that the graph is connected, undirected and has no self loops. Though there exist graph coloring algorithms that work with directed graphs, we thought that undirected graphs were more interesting. Furthermore, we wanted our graphs to be connected, because colorings for disconnected graphs can be reduced to colorings for each connected component of the graph. These are all choices and abstractions that we have built into our model.
+
+- Our `wellformed_colorings` predicate checks that the coloring is valid. This means that no two adjacent vertices share the same color. We also check that the coloring is complete, i.e. every vertex has a color. This is the essence of graph coloring.
+
+When run together, for N vertices and M colors, we get all the possible colorings of graphs with N vertices and M colors. If a graph with N vertices cannot be colored with M colors, we get UNSAT. Sterling gives us a nice visualization.
+
+```
+run { 
+  wellformed_graph
+  wellformed_colorings
+} for exactly 3 Vertex, exactly 2 Color, exactly 1 Coloring
+```
+#### Scheduling predicates
+
+- Our `course` predicate checks that a course doesn't intersect with itself, that if courses intersect then they are in each of their intersecting sets, and that all the courses form one inseparable scheduling problem. We wanted all our courses to be connected via the intersected field, because scheduling problems for disjoint sets of courses can be reduced to schedulings for disjoint set of courses. These are all choices and abstractions that we have built into our model.
+
+- Our `wellformed_schedule` predicate checks that the schedule is valid. This means that no two courses that intersect (share students) share the same exam slot. We also check that the scheduling is complete, i.e. every course is assigned an exam slot.
+
+When run together, for N Courses and M ExamSlots, we get all the possible schedulings with N courses and M exam slots. If there is no schedule satisfying a set of N Courses and M ExamSlots, we get UNSAT. Sterling gives us a nice visualization, which is quasi identical to the graph-coloring visualization.
+
+```
+run { 
+  wellformed_course
+  wellformed_schedule
+} for exactly 3 Course, exactly 2 ExamSlot, exactly 1 Scheduling
+```
+#### Equivalence predicates
 
 ## Visualization
 > How should we understand an instance of your model and what your visualization shows (whether custom or default)?
