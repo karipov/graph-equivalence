@@ -1,5 +1,6 @@
 # Colorful Complexity: Graph Coloring in Diverse Domains
 
+<<<<<<< HEAD
 ![banner](images/banner.png)
 
 ## Project Description
@@ -9,6 +10,28 @@ Although graph coloring may initially appear to be a purely theoretical problem,
 
 ## Problem Representation
 > What tradeoffs did you make in choosing your representation? What else did you try that didn’t work as well?
+
+We start with modeling graph coloring, scheduling and latin squares individually. Our expected solution space is all the possible graph colorings, all the possible scheduling and all the possible solutions to latin squares. 
+
+#### Graph and Coloring Representation
+
+In the midterm project, we represented the graph as a Vertex and a set of other vertices it is adjacent to. We have chosen to keep this characterization.
+
+```
+sig Vertex {
+  adjacent: set Vertex
+}
+```
+
+Now that we have a have a working model for a Graph, we can start thinking about how to model the coloring of the graph. We start by defining a set of colors and a function that maps each vertex to a color. To do this, we create a `Coloring` sig with a `pfunc`, as described.
+
+```
+sig Color {}
+
+one sig Coloring {
+    color: pfunc Vertex -> Color
+}
+```
 
 ## Visualization
 > How should we understand an instance of your model and what your visualization shows (whether custom or default)?
@@ -36,9 +59,4 @@ Coloring the graph in such a way that no two adjacent nodes have the same color 
 
 ## Collaborators and Sharing
 © Komron Aripov, Mathilde Kermorgant, and Sahdiah Cox
-
-
-
-
-
 

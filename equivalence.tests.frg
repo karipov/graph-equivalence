@@ -68,7 +68,7 @@ test suite for isomorphism {
       }
   } for exactly 1 Scheduling, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is theorem}
 
-  // Onto a few miscellaneous properties of isomorphisms:
+  // Onto a few miscellaneous properties of isomorphisms just for the fun of it:
 
   // If there is an isomorphism, 
   // then the number of vertices and the number of courses are equal
@@ -80,6 +80,13 @@ test suite for isomorphism {
   test expect {empty_isomorphism: {
     isomorphism
   } for exactly 0 Vertex, exactly 0 Course is theorem }
+
+  // sets of one element are vacuously isomorphic
+  -- note: we can treat them as sets as they have no extraneous structure 
+  -- on the elements: i.e. a graph with one node has no edges
+  test expect {one_element_isomorphism: {
+    wellformed_graph and wellformed_course and (some vertex : Vertex | some course: Course | Equivalence.morphism[course] = vertex) implies isomorphism 
+  } for exactly 1 Vertex, exactly 1 Course, exactly 1 Equivalence is theorem}
 }
 
 
@@ -146,6 +153,33 @@ test suite for isomorphism {
     Equivalence = `equiv0
     `equiv0.morphism = `course0 -> `vertex0 + `course1 -> `vertex1 + `course2 -> `vertex2
   }
+
+  // checking for satisfiability for the validation test conditions
+  // ensures that our tests aren't vacuously true
+
+  test expect {test1_conditions_sat: {
+    wellformed_course and isomorphism
+  } for exactly 1 Equivalence is sat} 
+
+  test expect {test2_conditions_sat: {
+    wellformed_graph and isomorphism
+  } for exactly 1 Equivalence is sat} 
+
+  test expect {test3_conditions_sat: {
+    wellformed_graph and isomorphism and wellformed_colorings and correspondance
+  } for exactly 1 Equivalence is sat}
+
+  test expect {test4_conditions_sat: {
+    wellformed_course and isomorphism and wellformed_schedule and correspondance
+  } for exactly 1 Equivalence is sat}
+
+  test expect {test5_conditions_sat: {
+    isomorphism and correspondance and wellformed_colorings and wellformed_graph    
+  } for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is sat}
+
+  test expect {test6_conditions_sat: {
+    isomorphism and correspondance and wellformed_schedule and wellformed_course  
+  } for exactly 1 Scheduling, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is sat}
 }
 
 test suite for correspondance {
