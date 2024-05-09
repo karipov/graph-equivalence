@@ -27,7 +27,7 @@ pred isomorphism {
         -- injective
         all disj course1, course2 : Course | equiv.morphism[course1] != equiv.morphism[course2]
         -- surjective
-        all vertex : Vertex | one course : Course | equiv.morphism[course] = vertex
+        all vertex : Vertex | {some course : Course | equiv.morphism[course] = vertex}
         -- "shape" preserving
         -- note: in both wellformed graphs and schedules we impose that intersecting and adjacent are reflexive
         all course1, course2 : Course | (equiv.morphism[course1] in (equiv.morphism[course2]).adjacent) implies (course1 in course2.intersecting)
