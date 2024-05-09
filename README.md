@@ -80,7 +80,7 @@ sig Equivalence {
 
 Moreover, to convert a coloring to a scheduling and vice versa we needed to have a correspondance between colors and exam slots, which is represented by the `SlotColorCorrepondance`signature with a mapping field.
 
-`````
+````
 sig SlotColorCorrespondance {
     mapping: set ExamSlot -> Color
 }
