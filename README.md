@@ -89,7 +89,7 @@ run {
 ```
 #### Scheduling predicates
 
-- Our `course` predicate checks that a course doesn't intersect with itself, that if courses intersect then they are in each of their intersecting sets, and that all the courses form one inseparable scheduling problem. We wanted all our courses to be connected via the intersected field, because scheduling problems for disjoint sets of courses can be reduced to schedulings for disjoint set of courses. These are all choices and abstractions that we have built into our model.
+- Our `wellformed_course` predicate checks that a course doesn't intersect with itself, that if courses intersect then they are in each of their intersecting sets, and that all the courses form one inseparable scheduling problem. We wanted all our courses to be connected via the intersected field, because scheduling problems for disjoint sets of courses can be reduced to schedulings for disjoint set of courses. These are all choices and abstractions that we have built into our model.
 
 - Our `wellformed_schedule` predicate checks that the schedule is valid. This means that no two courses that intersect (share students) share the same exam slot. We also check that the scheduling is complete, i.e. every course is assigned an exam slot.
 
