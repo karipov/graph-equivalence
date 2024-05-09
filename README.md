@@ -33,7 +33,7 @@ one sig Coloring {
 ```
 #### Scheduling representation
 
-We modelled the scheduling problem similarly to out graph coloring problem.
+We modelled the scheduling problem similarly to our graph coloring problem.
 
 Our first instinct was to represent a course as a `Course`sig with a set of students represented by the `Student`sig. We planned to model the scheduling problem such that two courses with intersecting set of students could not be assigned to the same time slot represented by the `ExamSlot` sig.
 
@@ -45,15 +45,15 @@ sig Course {
     students: set Student
 }
 
-```
+````
 However, we found this characterization bulky, and for the purposes of the assignment we did not feel that including individual students in the model would not help us achieve our goal. As such, we decided to be rid of the `Student` sig and model a course as:
-```
+````
 sig Course {
     intersecting: set Course
 }
-```
+````
 In addition, we decided to model a Scheduling by a pfunc from `Courses` to `ExamSlot` so that the overall model structure becomes: 
-```
+````
 sig ExamSlot {}
 
 sig Course {
@@ -63,7 +63,7 @@ sig Course {
 sig Scheduling {
     schedule: pfunc Course -> ExamSlot
 }
-```
+````
 Notice how similar the structure is to graph coloring. 
 
 
