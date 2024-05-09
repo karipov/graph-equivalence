@@ -103,6 +103,14 @@ run {
 ```
 #### Equivalence predicates
 
+- Our `ismorphism`predicate enforces that our `Equivalence.morphism` is an isomorphism. This means that it is total, injective, surjective and structure preserving. Hence, it is a one-to-one mapping such that two courses intersect if and only if their respective vertex mappings are connected by an edge. In essence, this isomorphism predicate ensures that we can get a one-to-one mapping from a scheduling problem to a graph coloring problem while exactly preserving the existing constraints. Moreover, since this is a one-to-one morphism, it can be inverted to be an isomorphism from a graph coloring problem to a scheduling problem!
+
+- Our `SlotColorCorrespondance` predicate enforces that our `SlotColorCorrespondance.mapping` is bijective. This means that it is total, injective and surjective. It established a one-to-one (so invertible) correspondance between colors and exam slots, which will be crucial in translating a graph coloring into a course scheduling and vice versa
+
+- Our `concat_is_wellformed_coloring[relation: set Vertex -> set Color]` predicate
+
+- Our `concat_is_wellformed_scheduling[relation: set Course -> set ExamSlot]` predicate 
+
 ## Visualization
 > How should we understand an instance of your model and what your visualization shows (whether custom or default)?
 
