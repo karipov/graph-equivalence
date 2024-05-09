@@ -68,6 +68,23 @@ Notice how similar the structure is to graph coloring.
 
 #### Graph-coloring and Scheduling equivalence
 
+Modelling the equivalence was a straightforward process. 
+
+We created a signature called `Equiavlence`with a morphism field representing the relation between courses and vertex. We decided to model the morphism as a relation `set Course -> Vertex` rather than a function or partial function since they have the same underlying structure. It represents an equivalence of constraints on a set of objects.
+
+````
+sig Equivalence {
+    morphism: set Course -> Vertex
+}
+````
+
+Moreover, to convert a coloring to a scheduling and vice versa we needed to have a correspondance between colors and exam slots, which is represented by the `SlotColorCorrepondance`signature with a mapping field.
+
+`````
+sig SlotColorCorrespondance {
+    mapping: set ExamSlot -> Color
+}
+````
 
 
 ## Predicates
