@@ -52,7 +52,7 @@ pred correspondance {
 // there is the concert that we construct relations and want to show that they exhibit the behaviour of function
 // further, given the resulting relation how do we show that it's a wellformed coloring/scheduling? Can preds intake sigs? that would be ideal
 
-pred concat_is_wellformed_coloring[relation: set Vertex -> set Color] {
+pred concat_is_wellformed_coloring[relation: set Vertex -> Color] {
     // all vertices have an assigned color
     all vertex: Vertex | one vertex.relation
 
@@ -62,7 +62,7 @@ pred concat_is_wellformed_coloring[relation: set Vertex -> set Color] {
     }
 }
 
-pred concat_is_wellformed_scheduling[relation: set Course -> set ExamSlot] {
+pred concat_is_wellformed_scheduling[relation: set Course -> ExamSlot] {
     // all courses have some assigned exam time slot
     all c: Course | some c.relation
 

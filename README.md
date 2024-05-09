@@ -86,7 +86,6 @@ sig SlotColorCorrespondance {
 }
 ````
 
-
 ## Predicates
 > At a high level, what do each of your sigs and preds represent in the context of the model? Justify the purpose for their existence and how they fit together.
 
@@ -124,9 +123,28 @@ run {
 
 - Our `SlotColorCorrespondance` predicate enforces that our `SlotColorCorrespondance.mapping` is bijective. This means that it is total, injective and surjective. It established a one-to-one (so invertible) correspondance between colors and exam slots, which will be crucial in translating a graph coloring into a course scheduling and vice versa
 
-- Our `concat_is_wellformed_coloring[relation: set Vertex -> set Color]` predicate
+- Our `concat_is_wellformed_coloring[relation: set Vertex -> Color]` predicate evaluates whether the given relation represents a wellformed coloring as defined in the graph-coloring section. It is essential to our property testing section.
 
-- Our `concat_is_wellformed_scheduling[relation: set Course -> set ExamSlot]` predicate 
+- Our `concat_is_wellformed_scheduling[relation: set Course -> ExamSlot]` predicate evaluates whether the given relation represents a wellformed schedule as defined in the scheduling section. It is essential to our property testing section.
+
+## Verification
+>What tests did you write to test your model itself? What tests did you write to verify properties about your domain area?
+
+#### Model tests 
+
+We wrote tests to check for over constraint and under constraint for all our models. We transfered over our graph coloring tests from the midterm project since the graph coloring section was unchanged. All the tests are in the files `coloring.tests.frg`, `scheduling.tests.frg` and `equivalence.tests.frg`. 
+
+#### Property tests
+
+THe main goal of this project is to prove that graph coloring and scheduling problems were equivalent. This is particularly well illustrated by the visualization. We did so in three steps:
+
+1. We proved that if we have a wellformed graph and an isomorphism between a graph and a set of intersecting courses, then the courses must also be wellformed. Conversely, we proved that if we have a wellformed set of intersecting courses and an isomorphism between a graph and a set of intersecting courses, then the graph must also be wellformed. This verifies that there is a bijection bewteen the constraints of each problem.
+
+2. We proved that if a wellformed graph has a valid coloring and there is an isomorphism between the graph and a set of intersecting courses, then the courses have a valid schduling. Conversely, we proved that if a wellformed set of intersecting courses has a valid scheduling and there is an isomorphism between the courses and a graph, then the graph has a valid coloring.
+
+3. We proved that given a wellformed graph, a valid coloring and an isomorphism between the graph and a set of intersecting courses, we can construct a valid scheduling for the courses. Conversely, we proved that given a wellformed set of intersecting courses, a valid scheduling and an isomorphism between the graph and a set of intersecting courses, we can construct a valid coloring for the graph.
+
+In addition, we tested a few miscellaneous properties of isomorphisms and correspondance relating to cardinality, empty sets and sets with one element. 
 
 ## Visualization
 > How should we understand an instance of your model and what your visualization shows (whether custom or default)?
@@ -149,7 +167,6 @@ We then consider an equivalent scheduling problem where:
 - A unique color represents a unique time-slot.
 
 Coloring the graph in such a way that no two adjacent nodes have the same color is then equivalent to scheduling exams in such a way that no student has two exams at the same time. The visualization generates some arbitrary but realistic time-slots per color and shows a timetable that is valid for the courses.
-
 
 
 ## Collaborators and Sharing
