@@ -1,6 +1,5 @@
 # Colorful Complexity: Graph Coloring in Diverse Domains
 
-<<<<<<< HEAD
 ![banner](images/banner.png)
 
 ## Project Description
