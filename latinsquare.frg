@@ -26,16 +26,22 @@ pred allIntersect {
     }
 }
 
-//every vertex has exactly 4 neighbors-- its row and column mates
+//every vertex has exactly 6 neighbors-- its row and column mates
 pred row_and_column_specs16 {
     all v: Vertex | {
         #{v.adjacent} = 6
     }
 }
 
+//every two vertexes should have two members in their intersection (column and row intersection)
+//and if two vertexes are in the same row or column, their mates should be in their intersection--
+//which means that they should also share the same column mates as their mates
 pred allIntersect16 {
     all disj v1, v2: Vertex | {
         #{v1.adjacent & v2.adjacent} = 2
+        v2 in v1.adjacent => {
+            all v3: Vertex | v3 in (v1.adjacent & v2.adjacent) => #{v1.adjacent & v2.adjacent & v3.adjacent} = 1
+        }
     }
 }
 
