@@ -5,19 +5,20 @@ open "scheduling.frg"
 open "equivalence.frg"
 
 
-// testing equivalence
+// Property verifications
+
 test suite for isomorphism {
 
   // First we show that if we have a wellformed graph 
   // and we know there is an isomorphism with the courses, then the courses are wellformed
-  test expect { try1: {
+  test expect { wellformed_graph_to_wellformed_course: {
     wellformed_course and isomorphism implies wellformed_graph
     } for exactly 1 Equivalence is theorem
   }
 
   //Similarly, we show that if we have wellformed courses
   // and we know there is an isomorphism with the graph, then the graph is wellformed
-  test expect { try2: {
+  test expect { wellformed_course_to_wellformed_graph: {
     wellformed_graph and isomorphism implies wellformed_course
     } for exactly 1 Equivalence is theorem
   }
@@ -31,7 +32,7 @@ test suite for isomorphism {
   // -- an isomorphism between the graph and the courses
   // -- a 1 to 1 correspondance between colors and exam slots
   // then, there exists a wellformed scheduling for the courses
-  test expect { try3: {
+  test expect { some_coloring_to_some_scheduling: {
     wellformed_graph and isomorphism and wellformed_colorings and correspondance implies wellformed_schedule
   } for exactly 1 Coloring, exactly 1 Scheduling is sat}
 
@@ -41,7 +42,7 @@ test suite for isomorphism {
   // -- an isomorphism between the graph and the courses
   // -- a 1 to 1 correspondance between colors and exam slots
   // then, there exists a wellformed coloring for the graph
-  test expect { try4: {
+  test expect { some_scheduling_to_some_coloring: {
     wellformed_course and isomorphism and wellformed_schedule and correspondance implies wellformed_colorings
   } for exactly 1 Coloring, exactly 1 Scheduling is sat}
 
@@ -53,168 +54,169 @@ test suite for isomorphism {
   // is it possible to solve one to get the solution for the other?
   // AKA given a wellformed schedule can we fully specify a wellformed coloring ?
   // And given a wellformed coloring, can we fully specify a wellformed schedule ?
+  // The following tests prove that it is always possible:
 
-  // this gives the error "join could create a relation of arity 0" not sure why :'(
-  test expect {try5: {
+  test expect {coloring_to_scheduling: {
     isomorphism and correspondance and wellformed_colorings and wellformed_graph implies {
       concat_is_wellformed_scheduling[(Equivalence.morphism).(Coloring.color).~(SlotColorCorrespondance.mapping)]
       }
   } for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is theorem}
 
-  test expect {try6: {
+  test expect {scheduling_to_coloring: {
     isomorphism and correspondance and wellformed_schedule and wellformed_course implies {
       concat_is_wellformed_coloring[(~(Equivalence.morphism)).(Scheduling.schedule).(SlotColorCorrespondance.mapping)]
       }
   } for exactly 1 Scheduling, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is theorem}
+
+  // Onto a few miscellaneous properties of isomorphisms just for the fun of it:
+
+  // If there is an isomorphism, 
+  // then the number of vertices and the number of courses are equal
+  test expect {cardinality: {
+    isomorphism and wellformed_graph implies #Vertex = #Course
+  } for exactly 1 Equivalence is theorem }
+
+  // empty sets are vacuously isomorphic
+  test expect {empty_isomorphism: {
+    isomorphism
+  } for exactly 0 Vertex, exactly 0 Course is theorem }
+
+  // sets of one element are vacuously isomorphic
+  -- note: we can treat them as sets as they have no extraneous structure 
+  -- on the elements: i.e. a graph with one node has no edges
+  test expect {one_element_isomorphism: {
+    wellformed_graph and wellformed_course and (some vertex : Vertex | some course: Course | Equivalence.morphism[course] = vertex) implies isomorphism 
+  } for exactly 1 Vertex, exactly 1 Course, exactly 1 Equivalence is theorem}
 }
 
-// basic tests for graph coloring
-test suite for wellformed_graph {
 
-  // wellformed graphs are not directed
-  example directed is {not wellformed_graph} for {
-    Vertex = `Vertex1 + `Vertex2
-    `Vertex1.adjacent = `Vertex2
+// Model Verifications
+
+test suite for isomorphism {
+  // valid isomorphism example
+  example valid_isomorphism is isomorphism for {
+    Vertex = `vertex0 + `vertex1
+    Course = `course0 + `course1
+    `vertex1.adjacent = `vertex0
+    `course0.intersecting = `course1
+
+    Equivalence = `equiv0  + `equiv1 
+    `equiv0.morphism = `course0 -> `vertex0 + `course1 -> `vertex1
+    `equiv1.morphism = `course0 -> `vertex1 + `course1 -> `vertex0
   }
 
-  // wellformed graphs are not disconnected
-  example unconnected is {not wellformed_graph} for {
-    Vertex = `Vertex1 + `Vertex2
+  // total
+  example morphism_not_total is not isomorphism for {
+    Vertex = `vertex0 
+    Course = `course0 + `course1
+    `course0.intersecting = `course1
+
+    Equivalence = `equiv0
+    `equiv0.morphism = `course0 -> `vertex0 
   }
 
-  // wellformed graphs don't contain self loops
-  example selfLoop is {not wellformed_graph} for {
-    Vertex = `Vertex1
-    `Vertex1.adjacent = `Vertex1
+  // injective
+  example morphism_not_injective is not isomorphism for {
+    Vertex = `vertex0 
+    Course = `course0 + `course1 
+    `course0.intersecting = `course1
+
+    Equivalence = `equiv0  + `equiv1 
+    `equiv0.morphism = `course0 -> `vertex0 + `course1 -> `vertex0
+  }
+  // surjective
+  example morphism_not_surjective is not isomorphism for {
+    Vertex = `vertex0 + `vertex1 + `vertex2
+    Course = `course0 + `course1
+    `vertex1.adjacent = `vertex0 + `vertex2
+    `course0.intersecting = `course1
+
+    Equivalence = `equiv0
+    `equiv0.morphism = `course0 -> `vertex0 + `course1 -> `vertex1
   }
 
-  // cyclic graphs are an example of wellformed graphs
-  example cyclic is {wellformed_graph} for {
-    Vertex = `Vertex1 + `Vertex2 + `Vertex3 + `Vertex4 + `Vertex5
-    `Vertex1.adjacent = `Vertex5 + `Vertex2
-    `Vertex2.adjacent = `Vertex1 + `Vertex3
-    `Vertex3.adjacent = `Vertex2 + `Vertex4
-    `Vertex4.adjacent = `Vertex3 + `Vertex5
-    `Vertex5.adjacent = `Vertex4 + `Vertex1
+  example morphism_not_surjective_empty is not isomorphism for {
+    Vertex = `vertex0 + `vertex1 + `vertex2
+    `vertex1.adjacent = `vertex0 + `vertex2
+
+    Equivalence = `equiv0
+  }
+  // preserve shape
+
+  example morphism_not_shape_preserving is not isomorphism for {
+    Vertex = `vertex0 + `vertex1 + `vertex2
+    Course = `course0 + `course1 + `course2
+    `vertex1.adjacent = `vertex0 + `vertex2
+    `course0.intersecting = `course1 + `course2
+    `course1.intersecting = `course0 + `course2
+
+    Equivalence = `equiv0
+    `equiv0.morphism = `course0 -> `vertex0 + `course1 -> `vertex1 + `course2 -> `vertex2
   }
 
-  //trees are examples of wellformed graphs
-  example SixVertexTree is {wellformed_graph} for {
-    Vertex = `Vertex1 + `Vertex2 + `Vertex3 + `Vertex4 + `Vertex5 + `Vertex6
-    `Vertex1.adjacent = `Vertex2 + `Vertex3 + `Vertex6
-    `Vertex2.adjacent = `Vertex1 + `Vertex4 + `Vertex5
-    `Vertex3.adjacent = `Vertex1
-    `Vertex4.adjacent = `Vertex2
-    `Vertex5.adjacent = `Vertex2
-    `Vertex6.adjacent = `Vertex1
-  }
+  // checking for satisfiability for the validation test conditions
+  // ensures that our tests aren't vacuously true
 
-  // cliques are examples of wellformed graphs
-  example ThreeClique is {wellformed_graph} for {
-    Vertex = `Vertex1 + `Vertex2 + `Vertex3 
-    `Vertex1.adjacent = `Vertex2 + `Vertex3
-    `Vertex2.adjacent = `Vertex1 + `Vertex3
-    `Vertex3.adjacent = `Vertex2 + `Vertex1
-  }
+  test expect {test1_conditions_sat: {
+    wellformed_course and isomorphism
+  } for exactly 1 Equivalence is sat} 
+
+  test expect {test2_conditions_sat: {
+    wellformed_graph and isomorphism
+  } for exactly 1 Equivalence is sat} 
+
+  test expect {test3_conditions_sat: {
+    wellformed_graph and isomorphism and wellformed_colorings and correspondance
+  } for exactly 1 Equivalence is sat}
+
+  test expect {test4_conditions_sat: {
+    wellformed_course and isomorphism and wellformed_schedule and correspondance
+  } for exactly 1 Equivalence is sat}
+
+  test expect {test5_conditions_sat: {
+    isomorphism and correspondance and wellformed_colorings and wellformed_graph    
+  } for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is sat}
+
+  test expect {test6_conditions_sat: {
+    isomorphism and correspondance and wellformed_schedule and wellformed_course  
+  } for exactly 1 Scheduling, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance is sat}
 }
 
-pred wellformed_and_colored { wellformed_graph and wellformed_colorings }
+test suite for correspondance {
 
-test suite for wellformed_and_colored {
-    -- no graph can be colored with one color
-    test expect { one_color_impossible: {
-        wellformed_and_colored
-        #{v: Vertex | some v} > 1
-    } for exactly 1 Color, exactly 1 Coloring is unsat}
+  // valid correspondance example 
+  example valid_correspondance is correspondance for {
+    Color = `c0 + `c1
+    ExamSlot = `es0 + `es1
 
-    test expect {incomplete_color: {
-      wellformed_and_colored
-      some vertex: Vertex | {no Coloring.color[vertex]}
-      } for exactly 1 Coloring is unsat} 
-
-    -- any tree can be colored with two colors
-    example fiveVertexTree is { wellformed_and_colored } for {
-      Vertex = `Vertex1 + `Vertex2 + `Vertex3 + `Vertex4 + `Vertex5
-      `Vertex1.adjacent = `Vertex2 + `Vertex3
-      `Vertex2.adjacent = `Vertex1 + `Vertex4 + `Vertex5
-      `Vertex3.adjacent = `Vertex1
-      `Vertex4.adjacent = `Vertex2
-      `Vertex5.adjacent = `Vertex2
-
-      Color = `Red + `Blue
-      Coloring = `Coloring1
-      `Coloring1.color =  `Vertex1 -> `Red + 
-                          `Vertex2 -> `Blue +
-                          `Vertex3 -> `Blue +
-                          `Vertex4 -> `Red +
-                          `Vertex5 -> `Red
-    }
-
-  -- a clique with N vertices cannot be colored with N-1 colors
-  example ThreeCliqueTwoColors is {not wellformed_and_colored} for {
-    Vertex = `Vertex1 + `Vertex2 + `Vertex3 
-    `Vertex1.adjacent = `Vertex2 + `Vertex3
-    `Vertex2.adjacent = `Vertex1 + `Vertex3
-    `Vertex3.adjacent = `Vertex2 + `Vertex1
-
-    Color = `Red + `Blue
-    Coloring = `Coloring1
-    `Coloring1.color =  `Vertex1 -> `Red + 
-                        `Vertex2 -> `Blue +
-                        `Vertex3 -> `Blue
-  }
-    
-  -- a clique with N vertices can be colored with N colors
-  example ThreeCliqueThreeColors is {wellformed_and_colored} for {
-    Vertex = `Vertex1 + `Vertex2 + `Vertex3 
-    `Vertex1.adjacent = `Vertex2 + `Vertex3
-    `Vertex2.adjacent = `Vertex1 + `Vertex3
-    `Vertex3.adjacent = `Vertex2 + `Vertex1
-
-    Color = `Red + `Blue + `Green
-    Coloring = `Coloring1
-    `Coloring1.color =  `Vertex1 -> `Red + 
-                        `Vertex2 -> `Blue +
-                        `Vertex3 -> `Green
+    SlotColorCorrespondance = `cor0 
+    `cor0.mapping = `es0 -> `c0 + `es1 -> `c1
   }
 
-  -- cyclic graphs with an even number of vertices can be colored with 2 colors
-  example cyclicEvenTwoColors is {wellformed_and_colored} for {
-    Vertex = `Vertex1 + `Vertex2 + `Vertex3 + `Vertex4 + `Vertex5 + `Vertex6
-    `Vertex1.adjacent = `Vertex6 + `Vertex2
-    `Vertex2.adjacent = `Vertex1 + `Vertex3
-    `Vertex3.adjacent = `Vertex2 + `Vertex4
-    `Vertex4.adjacent = `Vertex3 + `Vertex5
-    `Vertex5.adjacent = `Vertex4 + `Vertex6
-    `Vertex6.adjacent = `Vertex5 + `Vertex1
+  //total 
+  example mapping_not_total is not correspondance for {
+    Color = `c0 
+    ExamSlot = `es0 + `es1
 
-    Color = `Red + `Blue
-    Coloring = `Coloring1
-    `Coloring1.color =  `Vertex1 -> `Red + 
-                        `Vertex2 -> `Blue +
-                        `Vertex3 -> `Red +
-                        `Vertex4 -> `Blue +
-                        `Vertex5 -> `Red +
-                        `Vertex6 -> `Blue 
+    SlotColorCorrespondance = `cor0 
+    `cor0.mapping = `es0 -> `c0 
   }
-  
-  -- a coloring with a non minimal number of colors is still wellformed
-  example unoptimal is {wellformed_and_colored} for {
-    Vertex = `Vertex1 + `Vertex2 + `Vertex3 + `Vertex4 + `Vertex5 + `Vertex6
-    `Vertex1.adjacent = `Vertex6 + `Vertex2
-    `Vertex2.adjacent = `Vertex1 + `Vertex3
-    `Vertex3.adjacent = `Vertex2 + `Vertex4
-    `Vertex4.adjacent = `Vertex3 + `Vertex5
-    `Vertex5.adjacent = `Vertex4 + `Vertex6
-    `Vertex6.adjacent = `Vertex5 + `Vertex1
 
-    Color = `Red + `Blue + `Green
-    Coloring = `Coloring1
-    `Coloring1.color =  `Vertex1 -> `Red + 
-                        `Vertex2 -> `Blue +
-                        `Vertex3 -> `Red +
-                        `Vertex4 -> `Green +
-                        `Vertex5 -> `Red +
-                        `Vertex6 -> `Blue
+  //injective 
+  example mapping_not_injective is not correspondance for {
+    Color = `c0
+    ExamSlot = `es0 + `es1
+
+    SlotColorCorrespondance = `cor0 
+    `cor0.mapping = `es0 -> `c0 + `es1 -> `c0
+  }
+
+  //surjective 
+  example mapping_not_surjective is not correspondance for {
+    Color = `c0 + `c1
+    ExamSlot = `es0 
+
+    SlotColorCorrespondance = `cor0 
+    `cor0.mapping = `es0 -> `c0 
   }
 }

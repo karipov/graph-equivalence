@@ -27,7 +27,7 @@ pred isomorphism {
         -- injective
         all disj course1, course2 : Course | equiv.morphism[course1] != equiv.morphism[course2]
         -- surjective
-        all vertex : Vertex | one course : Course | equiv.morphism[course] = vertex
+        all vertex : Vertex | {some course : Course | equiv.morphism[course] = vertex}
         -- "shape" preserving
         -- note: in both wellformed graphs and schedules we impose that intersecting and adjacent are reflexive
         all course1, course2 : Course | (equiv.morphism[course1] in (equiv.morphism[course2]).adjacent) implies (course1 in course2.intersecting)
@@ -52,7 +52,7 @@ pred correspondance {
 // there is the concert that we construct relations and want to show that they exhibit the behaviour of function
 // further, given the resulting relation how do we show that it's a wellformed coloring/scheduling? Can preds intake sigs? that would be ideal
 
-pred concat_is_wellformed_coloring[relation: set Vertex -> set Color] {
+pred concat_is_wellformed_coloring[relation: set Vertex -> Color] {
     // all vertices have an assigned color
     all vertex: Vertex | one vertex.relation
 
@@ -62,7 +62,7 @@ pred concat_is_wellformed_coloring[relation: set Vertex -> set Color] {
     }
 }
 
-pred concat_is_wellformed_scheduling[relation: set Course -> set ExamSlot] {
+pred concat_is_wellformed_scheduling[relation: set Course -> ExamSlot] {
     // all courses have some assigned exam time slot
     all c: Course | some c.relation
 
