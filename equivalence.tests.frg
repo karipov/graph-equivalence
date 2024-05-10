@@ -220,3 +220,14 @@ test suite for correspondance {
     `cor0.mapping = `es0 -> `c0 
   }
 }
+
+test suite for concat_is_wellformed_coloring {
+
+  /*test expect {relation_is_coloring: {
+    (Vertex = `v1 + `v2 + `v3 
+    and `v1.adjacent = `v2 + `v3 
+    and `v2.adjacent = `v1
+    and `v3.adjacent = `v1
+    and Color = `c1 + `c2) implies concat_is_wellformed_coloring[`v3->`c1 + `v2->`c1 + `v1 ->`c2]
+  } for exactly 3 Vertex, exactly 2 Color is theorem} */
+}

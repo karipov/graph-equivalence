@@ -73,6 +73,7 @@ pred concat_is_wellformed_scheduling[relation: set Course -> ExamSlot] {
     }
 }
 
-run {
-    isomorphism and correspondance and wellformed_colorings and wellformed_graph
-} for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance
+
+/*run {
+    isomorphism and correspondance and wellformed_colorings and wellformed_graph and wellformed_schedule
+} for exactly 1 Coloring, exactly 1 Equivalence, exactly 1 SlotColorCorrespondance*/
