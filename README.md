@@ -1,5 +1,8 @@
 # Colorful Complexity: Graph Coloring in Diverse Domains
 
+[![Video Presentation](https://img.shields.io/badge/Video%20Presentation-mp4-green?style=flat&link=/video.mp4)](/video.mp4) [![Exploratory Work](https://img.shields.io/badge/Exploratory%20Work-frg-green?style=flat&link=/src/exploratory-work/)](/src/exploratory-work/)
+
+
 ![banner](images/banner.png)
 
 ## Project Description
