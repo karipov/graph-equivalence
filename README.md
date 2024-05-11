@@ -3,7 +3,7 @@
 ![banner](images/banner.png)
 
 ## Project Description
-> Yeah, #$@! is cool, but have you ever solved a scheduling problem using graph coloring?
+> Yeah, $3% is cool, but have you ever solved a scheduling problem using graph coloring?
 
 Although graph coloring may initially appear to be a purely theoretical problem, it has profound implications in applied fields like operations research and combinatorial optimization. In this project, we explore how the principles of graph coloring are equivalent to, and can be extended to, various practical problems. Specifically, we investigate its application in scheduling, where graph coloring helps in scheduling exams without conflicts, and in constructing Latin squares, which require placing distinct symbols in a grid such that each symbol appears only once per row and column. By examining these equivalences, we aim to enhance the utility of graph coloring properties and demonstrate their broad applicability in solving complex real-world problems.
 
