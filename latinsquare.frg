@@ -84,16 +84,16 @@ pred is_wellformed_coloring[coloring:Coloring] {
     }
 }
 
-// run { 
-//   wellformed_graph
-//   wellformed_colorings
-//   row_and_column_specs
-//   allIntersect
-// } for exactly 9 Vertex, exactly 3 Color, exactly 1 Coloring
-
-run {
+run { 
   wellformed_graph
   wellformed_colorings
-  row_and_column_specs16
-  allIntersect16  
-} for exactly 16 Vertex, exactly 4 Color, exactly 1 Coloring
+  row_and_column_specs
+  allIntersect
+} for exactly 9 Vertex, exactly 3 Color, exactly 1 Coloring
+
+// run {
+//   wellformed_graph
+//   wellformed_colorings
+//   row_and_column_specs16
+//   allIntersect16  
+// } for exactly 16 Vertex, exactly 4 Color, exactly 1 Coloring
