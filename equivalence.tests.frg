@@ -223,11 +223,60 @@ test suite for correspondance {
 
 test suite for concat_is_wellformed_coloring {
 
-  /*test expect {relation_is_coloring: {
-    (Vertex = `v1 + `v2 + `v3 
-    and `v1.adjacent = `v2 + `v3 
-    and `v2.adjacent = `v1
-    and `v3.adjacent = `v1
-    and Color = `c1 + `c2) implies concat_is_wellformed_coloring[`v3->`c1 + `v2->`c1 + `v1 ->`c2]
-  } for exactly 3 Vertex, exactly 2 Color is theorem} */
+  test expect {relation_is_coloring: {
+    wellformed_graph
+    some disj v1,v2,v3 : Vertex | some disj c1, c2 : Color | {
+      v2 in v1.adjacent and v3 in v1.adjacent
+      and v2 not in v3.adjacent
+      and concat_is_wellformed_coloring[((v3->c1) + (v2->c1) + (v1 ->c2))]
+    } 
+  } for exactly 3 Vertex, exactly 2 Color is sat} 
+
+  test expect {incomplete_coloring: {
+    wellformed_graph
+    some disj v1,v2,v3 : Vertex | some disj c1, c2 : Color | {
+      v2 in v1.adjacent and v3 in v1.adjacent
+      and v2 not in v3.adjacent
+      and concat_is_wellformed_coloring[((v2->c1) + (v1 ->c2))]
+    } 
+  } for exactly 3 Vertex, exactly 2 Color is unsat}
+
+  test expect {adjacent_same_color: {
+    wellformed_graph
+    some disj v1,v2,v3 : Vertex | some disj c1, c2 : Color | {
+      v2 in v1.adjacent and v3 in v1.adjacent
+      and v2 not in v3.adjacent
+      and concat_is_wellformed_coloring[((v3->c2) + (v2->c1) + (v1 ->c2))]
+    } 
+  } for exactly 3 Vertex, exactly 2 Color is unsat} 
 }
+
+test suite for concat_is_wellformed_scheduling {
+    
+  test expect {relation_is_scheduling: {
+    wellformed_graph
+    some disj c1,c2,c3 : Course | some disj es1, es2 : ExamSlot | {
+      c2 in c1.intersecting and c3 in c1.intersecting
+      and c2 not in c3.intersecting
+      and concat_is_wellformed_scheduling[((c3->es1) + (c2->es1) + (c1 ->es2))]
+    } 
+  } for exactly 3 Course, exactly 2 ExamSlot is sat} 
+
+  test expect {incomplete_scheduling: {
+    wellformed_graph
+    some disj c1,c2,c3 : Course | some disj es1, es2 : ExamSlot | {
+      c2 in c1.intersecting and c3 in c1.intersecting
+      and c2 not in c3.intersecting
+      and concat_is_wellformed_scheduling[((c2->es1) + (c1 ->es2))]
+    } 
+  } for exactly 3 Course, exactly 2 ExamSlot is unsat} 
+
+  test expect {simultaneous_intersecting: {
+    wellformed_graph
+    some disj c1,c2,c3 : Course | some disj es1, es2 : ExamSlot | {
+      c2 in c1.intersecting and c3 in c1.intersecting
+      and c2 not in c3.intersecting
+      and concat_is_wellformed_scheduling[((c3->es2) + (c2->es1) + (c1 ->es2))]
+    } 
+  } for exactly 3 Course, exactly 2 ExamSlot is unsat} 
+  }

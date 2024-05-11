@@ -52,4 +52,4 @@ pred is_wellformed_coloring[coloring:Coloring] {
 run { 
   wellformed_graph
   wellformed_colorings
-} for exactly 7 Vertex, exactly 6 Color, exactly 1 Coloring
+} for exactly 10 Vertex, exactly 6 Color, exactly 1 Coloring
