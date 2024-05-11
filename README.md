@@ -44,9 +44,8 @@ sig ExamSlot {}
 sig Course {
     students: set Student
 }
-
 ````
-However, we found this characterization bulky, and for the purposes of the assignment we did not feel that including individual students in the model would not help us achieve our goal. As such, we decided to be rid of the `Student` sig and model a course as:
+However, we found this characterization bulky, and for the purposes of the assignment we did not feel that including individual students in the model would not help us achieve our goal. This is a large simplification of the model, since in the real world, additional constraints may apply to the individuals. For instance, when scheduling shifts at the hospital, it's important that nurses don't have three back to back shifts. As such, we decided to be rid of the `Student` sig and model a course as:
 ````
 sig Course {
     intersecting: set Course
