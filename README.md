@@ -172,9 +172,9 @@ Coloring the graph in such a way that no two adjacent nodes have the same color 
 
 Scheduling is not the only problem that can be translated into graph coloring, and we explored a few alternatives. At first, we wanted to model Sudoku, but quickly found that we were limited by Forge's expressive power. Therefore, we limited ourselves to latin squares, a precursor to sudoku. 
 
-A Latin square is an n*n grid that must be completed with n elements so that every elmement appears exactly once in every row and every column. 
+A Latin square is an n by n grid that must be completed with n elements so that every elmement appears exactly once in every row and every column. 
 
-We did not prove that solving a latin square can be reduced to coloring a specific graph, but we implemented a few constraints on graphs in the `latinsquare.frg` file that would force a graph to represent 3*3 or 4*4 latin squares. 
+We did not prove that solving a latin square can be reduced to coloring a specific graph, but we implemented a few constraints on graphs in the `latinsquare.frg` file that would force a graph to represent 3 by 3 or 4 by 4 latin squares. 
 
 Note that unlike the scheduling problem, solving latin squares and coloring graphs are not equivalent problems. From every matin square we can make a graph, but the converse isn't true. 
 
